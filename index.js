@@ -28,6 +28,25 @@ app.get("/:address", async (req, res) => {
     }
   });
 });
+
+app.get("/token/:address", async (req, res) => {
+  const { address } = req.params;
+  const response = await contract.balanceOf(address);
+  console.log(response);
+  res.send(response.toString());
+});
+
+app.get("/tokenURI/:tokenId", async (req, res) => {
+  const { tokenId } = req.params;
+  try {
+    const response = await contract.tokenURI(tokenId);
+    console.log(response);
+    res.send(response);
+  } catch {
+    res.send("Token not found");
+  }
+});
+
 app.listen(3000, () => {
   console.log("Example app listening on port 3000!");
 });
