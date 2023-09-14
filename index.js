@@ -1,12 +1,16 @@
 const express = require("express");
 const app = express();
 const { contract, provider } = require("./utils/contracts");
+const cors = require("cors");
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
 app.get("/:address", async (req, res) => {
+  console.log(req.params, req.query);
   const { address } = req.params;
   const cid = req.query.cid;
 
@@ -15,15 +19,16 @@ app.get("/:address", async (req, res) => {
   const tx = await response.wait();
 
   const { hash } = tx;
-  console.log(hash);
+  // console.log(hash);
   const txn = await provider.getTransactionReceipt(hash);
-  console.log(txn);
+  // console.log(txn);
   txn.logs.forEach((log) => {
     if (contract.interface.parseLog(log).name === "minted") {
-      console.log(contract.interface.parseLog(log).args);
+      // console.log(contract.interface.parseLog(log).args);
       const tokenDetails = contract.interface.parseLog(log).args;
       const tokenId = tokenDetails[0].toString();
       const address = tokenDetails[1];
+
       res.send({ tokenId, address });
     }
   });

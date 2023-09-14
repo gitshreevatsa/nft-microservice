@@ -11,7 +11,7 @@ contract MyToken is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
-
+    event minted(address to, uint256 tokenId, string uri);
     constructor() ERC721("MyToken", "MTK") {
     }
 
@@ -20,6 +20,7 @@ contract MyToken is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        emit minted(to, tokenId, uri);
     }
 
     // The following functions are overrides required by Solidity.
