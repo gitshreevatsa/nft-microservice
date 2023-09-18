@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const { contract, provider } = require("./utils/contracts");
 const cors = require("cors");
+const CryptoJS = require("crypto-js");
+const jsonwebtoken = require("jsonwebtoken");
 
 app.use(cors());
 
@@ -26,7 +28,7 @@ app.get("/:address", async (req, res) => {
     if (contract.interface.parseLog(log).name === "minted") {
       // console.log(contract.interface.parseLog(log).args);
       const tokenDetails = contract.interface.parseLog(log).args;
-      const tokenId = tokenDetails[0].toString();
+      const tokenId = jsonwebtoken.sign(tokenDetails[0].toString(), process.env.SECRET);
       const address = tokenDetails[1];
 
       res.send({ tokenId, address });
@@ -44,7 +46,8 @@ app.get("/token/:address", async (req, res) => {
 app.get("/tokenURI/:tokenId", async (req, res) => {
   const { tokenId } = req.params;
   try {
-    const response = await contract.tokenURI(tokenId);
+    const tokenIdDecrypted = jsonwebtoken.verify(tokenId, process.env.SECRET);
+    const response = await contract.tokenURI(tokenIdDecrypted);
     console.log(response);
     res.send(response);
   } catch {
