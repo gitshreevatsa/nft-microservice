@@ -36,7 +36,7 @@ app.get("/:address", async (req, res) => {
   });
 });
 
-app.get("/token/:address", async (req, res) => {
+app.get("/balance/:address", async (req, res) => {
   const { address } = req.params;
   const response = await contract.balanceOf(address);
   console.log(response);
@@ -53,6 +53,19 @@ app.get("/tokenURI/:tokenId", async (req, res) => {
   } catch {
     res.send("Token not found");
   }
+});
+
+app.get("/token/:address", async (req, res) => {
+  const { address } = req.params;
+  const response = await contract.getTokenIDsByOwner(address);
+  let tokenIDs = {};
+  response.forEach((token) => {
+    token = token.toString();
+    console.log(token.toString());
+    tokenIDs[token] = jsonwebtoken.sign(token, process.env.SECRET);
+  })
+  console.log(tokenIDs);
+  res.send(tokenIDs);
 });
 
 app.listen(3000, () => {

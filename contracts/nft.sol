@@ -12,6 +12,9 @@ contract MyToken is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
 
     Counters.Counter private _tokenIdCounter;
     event minted(address to, uint256 tokenId, string uri);
+    mapping(address => uint256[]) public _ownedTokens;
+    mapping(uint256 => string) private _tokenURIs;
+
     constructor() ERC721("MyToken", "MTK") {
     }
 
@@ -20,7 +23,21 @@ contract MyToken is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        _ownedTokens[to].push(tokenId);
+        _tokenURIs[tokenId] = uri;
         emit minted(to, tokenId, uri);
+    }
+
+    // Function to get all token IDs owned by a given address
+    function getTokenIDsByOwner(address owner) public view returns (uint256[] memory) {
+        return _ownedTokens[owner];
+    }
+
+    // Function to get the URI of a token owned by the caller
+    function getTokenURI(uint256 tokenId) public view returns (string memory) {
+        require(_exists(tokenId), "Token does not exist");
+        require(_isApprovedOrOwner(msg.sender, tokenId), "Caller is not the owner");
+        return _tokenURIs[tokenId];
     }
 
     // The following functions are overrides required by Solidity.
@@ -35,7 +52,8 @@ contract MyToken is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
         override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
-        return super.tokenURI(tokenId);
+        // The public tokenURI function is overridden to return an empty string here
+        return "";
     }
 
     function supportsInterface(bytes4 interfaceId)

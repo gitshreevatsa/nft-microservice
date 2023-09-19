@@ -3,7 +3,7 @@ const abi = require("../abi/abi.json");
 require("dotenv").config();
 
 
-const address = "0x0B621Ea5C38b2cf0F6B5C9c15b81713734428681";
+const address = "0x8178B391DaA307EAC5647A048aD9E5c0f452b738";
 
 const provider = new ethers.JsonRpcProvider(
   "https://rpc.ankr.com/eth_sepolia"
